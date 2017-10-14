@@ -1,2 +1,4 @@
-build_appsproc/
-build_hexagon/
+build_appsproc_*/
+build_hexagon_*/
+downloads/
+binary

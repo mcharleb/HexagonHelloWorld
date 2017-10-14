@@ -54,7 +54,7 @@ endif()
 set(FASTRPC_DSP_INCLUDES
 	${HEXAGON_SDK_INCLUDES}
 	${HEXAGON_SDK_ROOT}/libs/common/rpcmem
-	${HEXAGON_SDK_ROOT}/libs/common/remote/ship/hexagon_${RELEASE}
+	${HEXAGON_SDK_ROOT}/libs/common/remote/ship/hexagon_Release_dynamic_toolv80_v55
 	)
 
 set(FASTRPC_ARM_LINUX_INCLUDES
@@ -65,9 +65,9 @@ set(FASTRPC_ARM_LINUX_INCLUDES
 	)
 
 if ("${DSP_TYPE}" STREQUAL "ADSP")
-	set(ADSPRPC -L${HEXAGON_SDK_ROOT}/libs/common/remote/ship/UbuntuARM_${RELEASE} -ladsprpc)
-elseif("${DSP_TYPE}" STREQUAL "SLPI")
-	set(ADSPRPC -L${HEXAGON_SDK_ROOT}/libs/common/remote/ship/UbuntuARM_${RELEASE} -lsdsprpc)
+	set(XDSPRPC -L${HEXAGON_SDK_ROOT}/libs/common/remote/ship/UbuntuARM_${RELEASE} -ladsprpc -lm)
+elseif("${DSP_TYPE}" STREQUAL "MDSP")
+	set(XDSPRPC -L${HEXAGON_SDK_ROOT}/libs/common/remote/ship/UbuntuARM_${RELEASE} -lmdsprpc -lm)
 else()
 	message(FATAL_ERROR "DSP_TYPE not defined")
 endif()
@@ -75,7 +75,7 @@ endif()
 set(ADSPMSGD ${HEXAGON_SDK_ROOT}/libs/common/adspmsgd/ship/UbuntuARM_${RELEASE}/adspmsgd.a)
 
 set(FASTRPC_ARM_LIBS
-	${ADSPRPC}
+	${XDSPRPC}
 	)
 
 	
@@ -105,7 +105,7 @@ function(FASTRPC_STUB_GEN IDLFILE)
 	add_custom_command(
 		OUTPUT ${FASTRPC_IDL_NAME}.h ${FASTRPC_IDL_NAME}_skel.c ${FASTRPC_IDL_NAME}_stub.c
 		DEPENDS ${FASTRPC_IDL_PATH}
-		COMMAND "${HEXAGON_SDK_ROOT}/tools/qaic/Linux/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/incs/stddef" ${QAIC_INCLUDE_DIRS} ${FASTRPC_IDL_PATH}
+		COMMAND "${HEXAGON_SDK_ROOT}/tools/qaic/Ubuntu14/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/incs/stddef" ${QAIC_INCLUDE_DIRS} ${FASTRPC_IDL_PATH}
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		)
 

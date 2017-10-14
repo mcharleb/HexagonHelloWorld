@@ -35,7 +35,7 @@
 #include "AEEStdDef.idl"
 
 interface example_interface{
-    uint32 say_hello();
+    uint32 say_hello(rout sequence<char> response);
 };
 
 #endif /*EXAMPLE_INTERFACE_IDL*/

@@ -70,20 +70,21 @@ if ("${BOARD}" STREQUAL "820C")
 		${HEXAGON_SDK_ROOT}/libs/common/qurt/ADSPv60MP/include
 		)
 	# Validate DSP_TYPE
-	if (NOT ("${DSP_TYPE}" STREQUAL "ADSP") && NOT ("${DSP_TYPE}" STREQUAL "SLPI"))
+	if (NOT ("${DSP_TYPE}" STREQUAL "ADSP"))
 		message(FATAL_ERROR "DSP_TYPE set to invalid value")
 	endif()
-elseif (("${BOARD}" STREQUAL "410C") || ("${BOARD}" STREQUAL "410E"))
+elseif ("${BOARD}" STREQUAL "410C")
 	# Set the default to MDSP
 	if ("${DSP_TYPE}" STREQUAL "")
 		set(DSP_TYPE "MDSP")
 	endif()
+	message("DSP is ${DSP_TYPE}")
 	set(V_ARCH "v55")
 	set(HEXAGON_SDK_INCLUDES ${HEXAGON_SDK_INCLUDES}
 		${HEXAGON_SDK_ROOT}/libs/common/qurt/ADSPv55MP/include
 		)
 	# Validate DSP_TYPE
-	if (NOT ("${DSP_TYPE}" STREQUAL "ADSP") && NOT ("${DSP_TYPE}" STREQUAL "MDSP"))
+	if (NOT ("${DSP_TYPE}" STREQUAL "ADSP") AND NOT ("${DSP_TYPE}" STREQUAL "MDSP"))
 		message(FATAL_ERROR "DSP_TYPE set to invalid value")
 	endif()
 else()

@@ -19,18 +19,16 @@ export HEXAGON_SDK_ROOT=~/Qualcomm/Hexagon_SDK/3.2
 Create a directory to hold the AArch64 cross compiler, extract it and export its location.
 
 ```
-
-export ARM_TOOLS_DIR=${HEXAGON_SDK_ROOT}/../../ARM_Tools
-mkdir -p ${ARM_TOOLS_DIR}
-
-wget https://releases.linaro.org/components/toolchain/binaries/latest-5/aarch64-linux-gnu/gcc-linaro-5.4.1-2017.05-x86_64_aarch64-linux-gnu.tar.xz
-tar xJvf gcc-linaro-5.4.1-2017.05-x86_64_aarch64-linux-gnu.tar.xz -C ${ARM_TOOLS_DIR}
-export ARM_CROSS_GCC_ROOT=${ARM_TOOLS_DIR}/gcc-linaro-5.4.1-2017.05-x86_64_aarch64-linux-gnu
+export GCC_CROSS_VER=gcc-linaro-5.4.1-2017.05-x86_64_aarch64-linux-gnu
+export ARM_CROSS_GCC_ROOT=~/ARM_Tools/${GCC_CROSS_VER}
+mkdir -p ${ARM_CROSS_GCC_ROOT}
+wget https://releases.linaro.org/components/toolchain/binaries/latest-5/aarch64-linux-gnu/${GCC_CROSS_VER}.tar.xz
+tar xJvf ${GCC_CROSS_VER}.tar.xz -C ${ARM_CROSS_GCC_ROOT}/..
 ```
 
-## Build
+## Cross Build
 
-The build requires HEXAGON_SDK_ROOT and ARM_CROSS_GCC_ROOT to be set.
+The cross build on PC requires HEXAGON_SDK_ROOT and ARM_CROSS_GCC_ROOT to be set.
 
 ```
 git clone http://github.com/DBOpenSource/HexagonHelloWorld
@@ -49,17 +47,16 @@ To build for 820C run:
 BOARD=820C make
 ```
 
-## Upload to target
+### Upload to target
 
-To upload the program to the device, connect the micro UDB cable to device and PC and verify that it is connected:
+To upload the program to the device, you will need to get the IP address of the target from the device serial console or the terminal connected to the device:
 ```
-sudo adb devices
+ip addr
 ```
+If connected via wifi you will see a wlan0 interface.
 
-You should see your device listed. Then upload the software:
-
+Then scp the files to the target:
 ```
-BOARD=410C make upload
+IPADDR=<ADDR> BOARD=410C make upload
 ```
-
 

@@ -50,8 +50,6 @@
 # LINUX_LIB function and the apps proc app can be built with the LINUX_APP
 # function.
 #
-# Build targets to load the apps proc app and libs are created from the
-# rules below. Look for resulting make targets ending in -load.
 
 include(fastrpc)
 
@@ -69,13 +67,6 @@ function(FASTRPC_ARM_LINUX_LOAD)
 		set(FASTRPC_ARM_LINUX_LOAD_DEST "${APPS_TARGET_PATH}")
 	endif()
 
-	# Add a rule to load the file onto the target
-	add_custom_target(${FASTRPC_ARM_LINUX_LOAD_LOADNAME}-load
-		DEPENDS ${FASTRPC_ARM_LINUX_LOAD_DEPNAME}
-		COMMAND adb wait-for-device
-		COMMAND adb push ${FASTRPC_ARM_LINUX_LOAD_TARGET} ${FASTRPC_ARM_LINUX_LOAD_DEST}
-		COMMAND echo "Pushed ${FASTRPC_ARM_LINUX_LOAD_TARGET} to ${FASTRPC_ARM_LINUX_LOAD_DEST}"
-		)
 endfunction()
 
 # Process DSP files
@@ -126,13 +117,6 @@ function (LINUX_LIB)
 
 	endif()
 
-	# Add a rule to load the files onto the target that run on apps proc
-	FASTRPC_ARM_LINUX_LOAD(
-		LOADNAME lib${LINUX_LIB_LIB_NAME}
-		TARGET lib${LINUX_LIB_LIB_NAME}.so
-		DEPNAME ${LINUX_LIB_LIB_NAME}
-		DEST ${LINUX_LIB_LIB_DEST}
-		)
 endfunction()
 
 # Process Apps proc app source and libs

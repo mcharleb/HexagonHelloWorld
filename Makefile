@@ -29,34 +29,52 @@
 # POSSIBILITY OF SUCH DAMAGE.
 ############################################################################
 
-# This demonstrates how to build the dsp lib and apps procportions separately.
+# This demonstrates how to build the dsp lib and apps proc portions separately.
 # helloworld builds just the apps proc portion and
 # libhelloworld just builds the hexagon portion.
 
-.PHONY check_env helloworld libhelloworld:
+all: helloworld libhelloworld
+
+all_targets:
+	BOARD=410C make
+	BOARD=820C make
+
+.PHONY check_env check_cross_env helloworld libhelloworld binary upload clean:
 
 check_env:
 	@if [ "${HEXAGON_SDK_ROOT}" = "" ]; then echo "HEXAGON_SDK_ROOT not set"; false; fi
-	@if [ "${ARM_CROSS_GCC_ROOT}" = "" ]; then echo "ARM_CROSS_GCC_ROOT not set"; false; fi
 	@if [ "${BOARD}" = "" ]; then echo "BOARD not set"; false; fi
 
-# This target builds only helloworld for apps proc
-helloworld: check_env
-	@mkdir -p build_appsproc && cd build_appsproc && cmake -Wno-dev ../appsproc -DBOARD=${BOARD} -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain/Toolchain-aarch64-linux-gnueabihf.cmake
-	@cd build_apps && make
+SYSROOT=linaro-stretch-developer-20170802-73.tar.gz
+
+export HEXAGON_ARM_SYSROOT=$(shell pwd)/binary
+
+check_cross_env: check_env
+	@if [ "${ARM_CROSS_GCC_ROOT}" = "" ]; then echo "ARM_CROSS_GCC_ROOT not set"; false; fi
+
+downloads/${SYSROOT}:
+	cd downloads && wget http://snapshots.linaro.org/debian/images/stretch/developer-arm64/73/${SYSROOT}
+
+# This is the extracted sysroot fakeroot is used to handle the device nodes
+binary:
+	fakeroot tar xvzf downloads/${SYSROOT}
+
+helloworld: check_cross_env binary
+	@mkdir -p build_appsproc_${BOARD} && cd build_appsproc_${BOARD} && cmake -Wno-dev ../appsproc -DBOARD=${BOARD} -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain/Toolchain-aarch64-linux-gnueabihf.cmake
+	@cd build_appsproc_${BOARD} && make
 	
-# This target builds only libhelloworld.so and libhelloworld_skel.so for adsp proc
+# This target builds only libhelloworld.so and libhelloworld_skel.so for Hexagon and can only be built on the PC
 libhelloworld: check_env
-	@mkdir -p build_hexagon && cd build_hexagon && cmake -Wno-dev ../hexagon -DBOARD=${BOARD} -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain/Toolchain-qurt.cmake
-	@cd build_hexagon && make
+	@mkdir -p build_hexagon_${BOARD} && cd build_hexagon_${BOARD} && cmake -Wno-dev ../hexagon -DBOARD=${BOARD} -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain/Toolchain-qurt.cmake
+	@cd build_hexagon_${BOARD} && make
+	
+
+# Use: IPADDR=1.2.3.4 BOARD=410C make upload
+upload: check_env cross
+	@if [ "${IPADDR}" = "" ]; then echo "IPADDR not set"; false; fi
+	if [ "${BOARD}" = "820C" ]; then scp build_hexagon_${BOARD}/lib*.so linaro@${IPADDR}:/usr/lib/rfsa/adsp; fi
+	if [ "${BOARD}" = "410C" ]; then scp build_hexagon_${BOARD}/lib*.so linaro@${IPADDR}:/usr/share/data/mdsp/; fi
 	
 clean:
-	@rm -rf build_hexagon build_appsproc
+	@rm -rf build_hexagon_* build_appsproc_*
 
-load-helloworld: helloworld
-	adb shell rm -f /usr/share/data/adsp/libexample_interface_skel.so /usr/share/data/adsp/libhelloworld.so /home/linaro/helloworld*
-	adb shell rm -f /usr/lib/rfsa/adsp/libexample_interface_skel.so /usr/lib/rfsa/adsp/libhelloworld.so
-	cd build_hexagon && make libhelloworld-load
-	cd build_appsproc && make helloworld-load
-
-load-libhelloworld: libhelloworld

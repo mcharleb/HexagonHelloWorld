@@ -50,8 +50,6 @@
 # QURT_LIB function and the apps proc app can be built with the help of the
 # the FASTRPC_ARM_APP_DEPS_GEN function.
 #
-# Build targets to load the apps proc app and DSP libs are created from the
-# rules below. Look for resulting make targets ending in -load.
 
 include(fastrpc)
 
@@ -118,30 +116,12 @@ function (QURT_LIB)
 	if ("${BOARD}" STREQUAL "820C")
 		# Set the location for APQ8096 target
 		set(DSPLIB_TARGET_PATH "/usr/lib/rfsa/adsp/")
-	elseif (("${BOARD}" STREQUAL "410C") || ("${BOARD}" STREQUAL "410E"))
+	elseif ("${BOARD}" STREQUAL "410C")
 		# Set the location for APQ8016 target
 		set(DSPLIB_TARGET_PATH "/usr/share/data/mdsp/")
  	else()
 		message(FATAL_ERROR "Unsupported BOARD")
 	endif()
    
-	if ("${QURT_LIB_LIB_NAME}" STREQUAL "")
-		# Add a rule to load the files onto the target that run in the DSP
-		add_custom_target(lib${QURT_LIB_IDL_NAME}_skel-load
-			DEPENDS ${QURT_LIB_IDL_NAME}_skel
-			COMMAND adb wait-for-device
-			COMMAND adb push lib${QURT_LIB_IDL_NAME}_skel.so ${DSPLIB_TARGET_PATH}
-			COMMAND echo "Pushed lib${QURT_LIB_IDL_NAME}_skel.so ${DSPLIB_TARGET_PATH}"
-			)
-	else()
-		# Add a rule to load the files onto the target that run in the DSP
-		add_custom_target(lib${QURT_LIB_LIB_NAME}-load
-			DEPENDS ${QURT_LIB_LIB_NAME} ${QURT_LIB_IDL_NAME}_skel
-			COMMAND adb wait-for-device
-			COMMAND adb push lib${QURT_LIB_IDL_NAME}_skel.so ${DSPLIB_TARGET_PATH}
-			COMMAND adb push lib${QURT_LIB_LIB_NAME}.so ${DSPLIB_TARGET_PATH}
-			COMMAND echo "Pushed lib${QURT_LIB_LIB_NAME}.so and dependencies to ${DSPLIB_TARGET_PATH}"
-			)
-	endif()
 endfunction()
 

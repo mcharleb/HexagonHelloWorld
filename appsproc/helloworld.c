@@ -35,6 +35,10 @@
 
 int main()
 {
+	char response[100];
+	uint32_t rv;
 	printf("Asking DSP to say hello\n");
-	return example_interface_say_hello();
+	rv = example_interface_say_hello(response, sizeof(response));
+	printf("DSP responded with return value %u, response '%s'\n", rv, response);
+	return 0;
 }

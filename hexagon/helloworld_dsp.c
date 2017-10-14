@@ -32,8 +32,9 @@
 #include "dsp_log.h"
 #include "example_interface.h"
 
-uint32 example_interface_say_hello()
+uint32 example_interface_say_hello(char *response, int len)
 {
 	LOG_MSG("Hello World");
+	snprintf(response, len, "Hello!");
 	return 0;
 }
